@@ -1,6 +1,8 @@
 This repository is non-server image orgnize program.
+
 If you have many photos for a post to blog
-This program helps you organize your photos.
+
+This program helps you organize your photos.
 
 _How to use?_
 Fortunately, It's very simple.
