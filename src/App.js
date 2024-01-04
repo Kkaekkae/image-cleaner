@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import exifr from "exifr";
-import moment from "moment";
 import FileSaver from "file-saver";
 import JSZip from "jszip";
-const zip = JSZip();
+import moment from "moment";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 function App() {
     const fileId = useRef(0);
     const inputRef = useRef();
@@ -13,6 +13,7 @@ function App() {
     const [convertedFiles, setConvertedFiles] = useState({});
     const [isConverting, setConverting] = useState(false);
     const [convertCount, setConvertCount] = useState(0);
+    const [isCompress, setCompress] = useState(true);
     const MAX_WIDTH = 1920;
     const MAX_HEIGHT = 1080;
 
@@ -38,7 +39,6 @@ function App() {
             }
 
             setFiles(tempFiles);
-            console.log("setFiles");
         },
         [files]
     );
@@ -54,6 +54,7 @@ function App() {
         let currentConvertCount = 0;
         setConvertedFiles([]);
         setConverting(true);
+
         if (files.length === 0) setConverting(false);
         files.forEach(async (file, index) => {
             const uf = await processFile(file.object);
@@ -71,16 +72,18 @@ function App() {
                 name: file.object.name.split(".")[0] + ".webp",
                 data: uf,
             });
-            setConvertCount(currentConvertCount++);
+
             if (index === files.length - 1) {
                 setConverting(false);
             }
         });
         setConvertedFiles(f);
+        setConvertCount(files.length);
     });
 
     useEffect(() => {
         setConverting(true);
+        setConvertCount(0);
         addFiles();
     }, [files]);
 
@@ -141,16 +144,17 @@ function App() {
                 if (rawImage.src) {
                     var width = rawImage.width;
                     var height = rawImage.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
+                    if (isCompress) {
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
                         }
                     }
                     canvas.width = width;
@@ -167,7 +171,33 @@ function App() {
         });
     }
 
-    const handleDownload = async () => {
+    const getObjectDataOfDepth = (data, depth, currentDepth = 0) => {
+        if (depth > currentDepth)
+            return getObjectDataOfDepth(
+                data[Object.keys(data)[0]],
+                depth,
+                currentDepth + 1
+            );
+        else return data;
+    };
+
+    const oneFileDownload = () => {
+        const file = getObjectDataOfDepth(convertedFiles, 3)[0];
+        const url = URL.createObjectURL(file.data);
+        console.log(url);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout((_) => {
+            window.URL.revokeObjectURL(url);
+        }, 60000);
+        a.remove();
+    };
+
+    const multipleFileDownload = async () => {
+        const zip = JSZip();
         await Object.entries(convertedFiles).forEach(([year, months]) => {
             const yf = zip.folder(year);
             Object.entries(months).forEach(([month, days]) => {
@@ -179,11 +209,14 @@ function App() {
                     });
                 });
             });
-
-            zip.generateAsync({ type: "blob" }).then((content) => {
-                FileSaver.saveAs(content, "test.zip");
-            });
         });
+        zip.generateAsync({ type: "blob" }).then((content) => {
+            FileSaver.saveAs(content, "test.zip");
+        });
+    };
+
+    const handleDownload = async () => {
+        convertCount === 1 ? oneFileDownload() : await multipleFileDownload();
     };
 
     return (
@@ -192,7 +225,7 @@ function App() {
             ref={dragRef}
             onPaste={handlePaste}
         >
-            <div className="mb-20 w-full text-center">
+            <div className="mb-4 w-full text-center">
                 <p className="text-xl text-gray-500">
                     Would you like to automatically clean standard photos based
                     on date?
@@ -205,7 +238,16 @@ function App() {
                     Upload JPG/JPEG File!
                 </h2>
             </div>
-
+            <div className="mb-4">
+                <label className="mr-2">
+                    Do you want compress image file ? (1920 x 1080)
+                </label>
+                <input
+                    type="checkbox"
+                    checked={isCompress}
+                    onChange={(e) => setCompress(!isCompress)}
+                />
+            </div>
             <label
                 htmlFor={"file-upload"}
                 className="border rounded p-8 w-96 flex-col items-center text-center bg-white relative"
@@ -227,7 +269,7 @@ function App() {
                 <p className="border-dashed border-4 py-12">Drag & Drop</p>
             </label>
 
-            <label className="realtive">
+            <button className="realtive mt-4">
                 {convertedFiles && Object.keys(convertedFiles).length > 0 && (
                     <p className="underline" onClick={() => handleDownload()}>
                         Download
@@ -236,7 +278,7 @@ function App() {
                 {isConverting && (
                     <p onClick={() => handleDownload()}>Converting...</p>
                 )}
-            </label>
+            </button>
         </div>
     );
 }
