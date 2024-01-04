@@ -250,16 +250,20 @@ function App() {
             ref={dragRef}
             onPaste={handlePaste}
         >
-            <div className="mb-4 w-full text-center">
+            <div className="mb-16 w-full text-center">
                 <p className="text-xl text-gray-500">
                     Would you like to automatically clean standard photos based
                     on date?
                 </p>
-                <p className="text-xl text-gray-500">
-                    This program will help you achieve what you want without a
-                    network.
+                <p className="text-xl text-gray-500 mb-8">
+                    This program will help you achieve what you want fastest
+                    without any network.
                 </p>
-                <h2 className="text-4xl font-extrabold">Upload Image File!</h2>
+                <h1 className="md:text-6xl sm:text-4xl font-extrabold leading-relaxed">
+                    <span className="font-normal">JPG → WebP</span>
+                    <br />
+                    Free Image Converter
+                </h1>
             </div>
             <div className="mb-2">
                 <label className="mr-2">
