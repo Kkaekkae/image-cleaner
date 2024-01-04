@@ -14,6 +14,7 @@ function App() {
     const [isConverting, setConverting] = useState(false);
     const [convertCount, setConvertCount] = useState(0);
     const [isCompress, setCompress] = useState(true);
+    const [isOrganize, setOrganize] = useState(false);
     const MAX_WIDTH = 1920;
     const MAX_HEIGHT = 1080;
 
@@ -59,7 +60,7 @@ function App() {
         files.forEach(async (file, index) => {
             const uf = await processFile(file.object);
             const et = await exifr.parse(file.object);
-            const momentDate = moment(et.ModifyDate);
+            const momentDate = moment(et?.CreateDate ? et.CreateDate : null);
             const d = {
                 y: momentDate.format("YYYY"),
                 m: momentDate.format("M"),
@@ -184,7 +185,6 @@ function App() {
     const oneFileDownload = () => {
         const file = getObjectDataOfDepth(convertedFiles, 3)[0];
         const url = URL.createObjectURL(file.data);
-        console.log(url);
         const a = document.createElement("a");
         a.href = url;
         a.download = file.name;
@@ -196,20 +196,45 @@ function App() {
         a.remove();
     };
 
+    const organizeFiles = async (zip) => {
+        await Object.entries(convertedFiles).forEach(([year, months]) => {
+            if (year === "Invalid date") {
+                const invalidFiles = getObjectDataOfDepth(months, 2);
+                const invalidFolder = zip.folder("no_date");
+                invalidFiles.map(async (file) => {
+                    await invalidFolder.file(file.name, file.data);
+                });
+            } else {
+                const yf = zip.folder(year);
+                Object.entries(months).forEach(([month, days]) => {
+                    const mf = yf.folder(month);
+                    Object.entries(days).forEach(([day, files]) => {
+                        const df = mf.folder(day);
+                        files.map(async (file) => {
+                            await df.file(file.name, file.data);
+                        });
+                    });
+                });
+            }
+        });
+    };
+
     const multipleFileDownload = async () => {
         const zip = JSZip();
-        await Object.entries(convertedFiles).forEach(([year, months]) => {
-            const yf = zip.folder(year);
-            Object.entries(months).forEach(([month, days]) => {
-                const mf = yf.folder(month);
-                Object.entries(days).forEach(([day, files]) => {
-                    const df = mf.folder(day);
-                    files.map(async (file) => {
-                        await df.file(file.name, file.data);
+        const rootFolder = zip.folder(`webp_files_${moment().unix()}`);
+        if (isOrganize) {
+            await organizeFiles(rootFolder);
+        } else {
+            Object.values(convertedFiles).map(async (month) => {
+                Object.values(month).map(async (days) => {
+                    Object.values(days).map(async (files) => {
+                        files.map(async (file) => {
+                            await rootFolder.file(file.name, file.data);
+                        });
                     });
                 });
             });
-        });
+        }
         zip.generateAsync({ type: "blob" }).then((content) => {
             FileSaver.saveAs(content, "test.zip");
         });
@@ -236,7 +261,7 @@ function App() {
                 </p>
                 <h2 className="text-4xl font-extrabold">Upload Image File!</h2>
             </div>
-            <div className="mb-4">
+            <div className="mb-2">
                 <label className="mr-2">
                     Do you want compress image file ? (1920 x 1080)
                 </label>
@@ -244,6 +269,16 @@ function App() {
                     type="checkbox"
                     checked={isCompress}
                     onChange={(e) => setCompress(!isCompress)}
+                />
+            </div>
+            <div className="mb-4">
+                <label className="mr-2">
+                    Do you want organize folder of Date ? (with Image Meta Tag)
+                </label>
+                <input
+                    type="checkbox"
+                    checked={isOrganize}
+                    onChange={(e) => setOrganize(!isOrganize)}
                 />
             </div>
             <label
