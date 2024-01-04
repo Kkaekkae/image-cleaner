@@ -260,7 +260,7 @@ function App() {
                     without any network.
                 </p>
                 <h1 className="md:text-6xl sm:text-4xl font-extrabold leading-relaxed">
-                    <span className="font-normal">JPG → WebP</span>
+                    <span className="font-normal">JPG,PNG → WebP</span>
                     <br />
                     Free Image Converter
                 </h1>
