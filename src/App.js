@@ -234,9 +234,7 @@ function App() {
                     This program will help you achieve what you want without a
                     network.
                 </p>
-                <h2 className="text-4xl font-extrabold">
-                    Upload JPG/JPEG File!
-                </h2>
+                <h2 className="text-4xl font-extrabold">Upload Image File!</h2>
             </div>
             <div className="mb-4">
                 <label className="mr-2">
