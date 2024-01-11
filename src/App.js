@@ -246,7 +246,7 @@ function App() {
 
     return (
         <div
-            className="w-full h-screen flex justify-center items-center flex-col bg-cyan-100"
+            className="w-full h-screen flex justify-center items-center flex-col "
             ref={dragRef}
             onPaste={handlePaste}
         >
@@ -265,46 +265,55 @@ function App() {
                     Free Image Converter
                 </h1>
             </div>
-            <div className="mb-2">
-                <label className="mr-2">
-                    Do you want compress image file ? (1920 x 1080)
-                </label>
-                <input
-                    type="checkbox"
-                    checked={isCompress}
-                    onChange={(e) => setCompress(!isCompress)}
-                />
+            <div className="text-left mb-6 text-gray-500">
+                <div className="mb-2">
+                    <label className="mr-2">
+                        Do you want compress image file ? (1920 x 1080)
+                    </label>
+                    <input
+                        type="checkbox"
+                        checked={isCompress}
+                        onChange={(e) => setCompress(!isCompress)}
+                    />
+                </div>
+                <div className="mb-4">
+                    <label className="mr-2">
+                        Do you want organize folder of Date ? (with Image Meta
+                        Tag)
+                    </label>
+                    <input
+                        type="checkbox"
+                        checked={isOrganize}
+                        onChange={(e) => setOrganize(!isOrganize)}
+                    />
+                </div>
             </div>
-            <div className="mb-4">
-                <label className="mr-2">
-                    Do you want organize folder of Date ? (with Image Meta Tag)
-                </label>
-                <input
-                    type="checkbox"
-                    checked={isOrganize}
-                    onChange={(e) => setOrganize(!isOrganize)}
-                />
-            </div>
-            <label
-                htmlFor={"file-upload"}
-                className="border rounded p-8 w-96 flex-col items-center text-center bg-white relative"
+            <div
+                className="border rounded p-8 w-96 flex-col items-center text-center bg-white relative shadow-2xl inline-block"
+                style={{ width: "680px" }}
             >
-                <button className="border rounded py-2 px-4 border-gray-300">
-                    + File Upload
-                </button>
-                <input
-                    type="file"
-                    multiple
-                    id="file-upload"
-                    className="opacity-0 absolute inset-0"
-                    ref={inputRef}
-                    onChange={onChangeFiles}
-                    onDrop={handleDrop}
-                />
+                <label
+                    htmlFor={"file-upload"}
+                    className="border rounded py-4 px-16 bg-blue-500 text-white hover:bg-blue-600 text-2xl font-bold white"
+                >
+                    Choose multiple images
+                    <input
+                        type="file"
+                        multiple
+                        id="file-upload"
+                        className="opacity-0 absolute inset-0"
+                        ref={inputRef}
+                        onChange={onChangeFiles}
+                        onDrop={handleDrop}
+                    />
+                </label>
+
                 <p className="my-4">OR</p>
 
-                <p className="border-dashed border-4 py-12">Drag & Drop</p>
-            </label>
+                <p className="border-dashed border-4 py-12 relative text-3xl text-gray-600 font-thin">
+                    Drag & Drop{" "}
+                </p>
+            </div>
 
             <button className="realtive mt-4">
                 {convertedFiles && Object.keys(convertedFiles).length > 0 && (
