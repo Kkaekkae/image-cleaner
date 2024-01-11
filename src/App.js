@@ -289,12 +289,12 @@ function App() {
                 </div>
             </div>
             <div
-                className="border rounded p-8 w-96 flex-col items-center text-center bg-white relative shadow-2xl inline-block"
+                className="border rounded p-8 w-96 flex-col items-center text-center bg-white relative shadow-2xl"
                 style={{ width: "680px" }}
             >
                 <label
                     htmlFor={"file-upload"}
-                    className="border rounded py-4 px-16 bg-blue-500 text-white hover:bg-blue-600 text-2xl font-bold white"
+                    className="border rounded py-4 px-16 bg-blue-500 text-white hover:bg-blue-600 text-2xl font-bold white inline-block"
                 >
                     Choose multiple images
                     <input
