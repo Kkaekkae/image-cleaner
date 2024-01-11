@@ -80,6 +80,7 @@ function App() {
         });
         setConvertedFiles(f);
         setConvertCount(files.length);
+        handleDownload();
     });
 
     useEffect(() => {
@@ -317,9 +318,7 @@ function App() {
 
             <button className="realtive mt-4">
                 {convertedFiles && Object.keys(convertedFiles).length > 0 && (
-                    <p className="underline" onClick={() => handleDownload()}>
-                        Download
-                    </p>
+                    <p>Done.</p>
                 )}
                 {isConverting && (
                     <p onClick={() => handleDownload()}>Converting...</p>
