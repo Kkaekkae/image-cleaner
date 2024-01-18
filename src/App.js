@@ -324,6 +324,9 @@ function App() {
                     <p onClick={() => handleDownload()}>Converting...</p>
                 )}
             </button>
+            <p className="mt-10 text-gray-400 text-lg">
+                <label className="mr-4">Contact</label> illychoi.dev@gmail.com
+            </p>
         </div>
     );
 }
